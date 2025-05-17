@@ -3,6 +3,21 @@
 version = 4
 
 [[package]]
+name = "capnp"
+version = "0.21.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1d1b4a00e80b7c4b1a49e845365f25c9d8fd0a19c9cd8d66f68afea47b1f020"
+dependencies = [
+ "embedded-io",
+]
+
+[[package]]
+name = "embedded-io"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
+
+[[package]]
 name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -19,8 +34,17 @@ name = "libmahjong-rs"
 version = "0.1.0"
 dependencies = [
  "libc",
+ "libmahjong-specs",
  "strum",
  "strum_macros",
+]
+
+[[package]]
+name = "libmahjong-specs"
+version = "0.1.0"
+source = "git+https://github.com/realliance/libmahjong-specs.git?branch=dist%2Frust#e26e6558a95328713c9929b497aab19e45f0dba1"
+dependencies = [
+ "capnp",
 ]
 
 [[package]]
