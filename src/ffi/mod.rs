@@ -1,16 +1,14 @@
-
-pub mod gamestate;
-pub mod gamesettings;
 pub mod error;
+pub mod gamesettings;
+pub mod gamestate;
 
 #[cfg(test)]
 mod tests {
-    use crate::settings::GameSettings;
     use crate::ffi::gamestate::GameState;
+    use crate::settings::GameSettings;
 
     #[test]
     fn can_create_game() {
-
         let settings = GameSettings {
             seed: 12345,
             seat_controllers: [
@@ -23,7 +21,10 @@ mod tests {
 
         let game_state = GameState::new(settings).unwrap();
 
-        assert!(!game_state.as_ptr().is_null(), "Game state pointer should not be null");
+        assert!(
+            !game_state.as_ptr().is_null(),
+            "Game state pointer should not be null"
+        );
     }
 
     #[test]
@@ -44,13 +45,15 @@ mod tests {
         loop {
             if counter < 5 {
                 counter += 1;
-                game_state = game_state.advance()
-                    .expect("Failed to advance game state");
+                game_state = game_state.advance().expect("Failed to advance game state");
             } else {
                 break;
             }
-        };
+        }
 
-        assert!(!game_state.as_ptr().is_null(), "Game state pointer shouldnt be null");
+        assert!(
+            !game_state.as_ptr().is_null(),
+            "Game state pointer shouldnt be null"
+        );
     }
 }

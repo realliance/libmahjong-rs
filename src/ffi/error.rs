@@ -1,4 +1,3 @@
-
 #[derive(Debug, thiserror::Error)]
 /// Error type for Mahjong FFI operations
 pub enum MahjongFFIError {

@@ -34,7 +34,9 @@ pub struct GameState {
 
 impl GameState {
     /// Create a new game state from settings
-    pub fn new<S: TryInto<CGameSettings, Error = MahjongFFIError>>(settings: S) -> Result<Self, MahjongFFIError> {
+    pub fn new<S: TryInto<CGameSettings, Error = MahjongFFIError>>(
+        settings: S,
+    ) -> Result<Self, MahjongFFIError> {
         let ptr = unsafe {
             let settings: CGameSettings = settings.try_into()?;
             Ok(InitGameState(&settings))

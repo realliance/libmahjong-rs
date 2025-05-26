@@ -1,4 +1,4 @@
-use std::{ffi::{c_char, c_int, CString}};
+use std::ffi::{c_char, c_int, CString};
 
 use crate::settings::GameSettings;
 
@@ -22,7 +22,6 @@ impl TryFrom<GameSettings> for CGameSettings {
     type Error = MahjongFFIError;
 
     fn try_from(value: GameSettings) -> Result<Self, Self::Error> {
-        
         Ok(Self {
             seed: value.seed,
             seat_controllers: [
