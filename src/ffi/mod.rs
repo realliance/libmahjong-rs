@@ -56,4 +56,9 @@ mod tests {
             "Game state pointer shouldnt be null"
         );
     }
+
+    // TODO chris, we dont have enough insight into the running game to tell when its complete 
+    // (such as the current state), so we technically dont know when to stop running the game.
+    // We should expand the API to allow for this at least, possibly observing the current event
+    // would be enough, or gleaming parts of the gamestate in some C-ABI safe way
 }
