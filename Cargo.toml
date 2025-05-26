@@ -9,3 +9,4 @@ libmahjong-specs = { git = "https://github.com/realliance/libmahjong-specs.git",
 libc = "0.2.171"
 strum = "0.27"
 strum_macros = "0.27"
+thiserror = "2"

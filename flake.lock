@@ -57,16 +57,16 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1744574510,
-        "narHash": "sha256-dwwn2lNik9MnbSGdjUOPfIcNtURYXGcr6lteDtMd9tQ=",
+        "lastModified": 1747172834,
+        "narHash": "sha256-0ZbA07KuHKTolETlAJ5+/8MHoJVZHENNUejmU/s/VLI=",
         "owner": "realliance",
         "repo": "libmahjong",
-        "rev": "ca61cd2d9dda16eb0ccb42611d8f530538aa2e1a",
+        "rev": "596d679eb982b72fa3949c14016eea4617c53085",
         "type": "github"
       },
       "original": {
         "owner": "realliance",
-        "ref": "next",
+        "ref": "chrmiller/c-api-basic",
         "repo": "libmahjong",
         "type": "github"
       }

@@ -6,7 +6,7 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url  = "github:numtide/flake-utils";
 
-    libmahjong.url = "github:realliance/libmahjong/next";
+    libmahjong.url = "github:realliance/libmahjong/chrmiller/c-api-basic";
 
     crane = {
       url = "github:ipetkov/crane";
