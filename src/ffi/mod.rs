@@ -1,11 +1,13 @@
 pub mod error;
 pub mod gamesettings;
 pub mod gamestate;
+pub mod observe;
 
 #[cfg(test)]
 mod tests {
     use crate::ffi::gamestate::GameState;
     use crate::settings::GameSettings;
+    use crate::observe::StateFunctionType;
 
     #[test]
     fn can_create_game() {
@@ -57,8 +59,34 @@ mod tests {
         );
     }
 
-    // TODO chris, we dont have enough insight into the running game to tell when its complete 
-    // (such as the current state), so we technically dont know when to stop running the game.
-    // We should expand the API to allow for this at least, possibly observing the current event
-    // would be enough, or gleaming parts of the gamestate in some C-ABI safe way
+    #[test]
+    fn can_observe_game_state() {
+        let settings = GameSettings {
+            seed: 12345,
+            seat_controllers: [
+                "AlphabeticalBot".to_string(),
+                "AlphabeticalBot".to_string(),
+                "AlphabeticalBot".to_string(),
+                "AlphabeticalBot".to_string(),
+            ],
+        };
+
+        let game_state = GameState::new(settings).unwrap();
+        
+        // Test that we can observe the game state
+        let observed = game_state.observe();
+        
+        // Basic sanity checks - newly created game state will have initial values
+        assert_eq!(observed.seed(), 12345);
+        // Current player is -1 for newly created game (not started yet)
+        assert_eq!(observed.current_player(), -1);
+        // Current state should be Error for uninitialized game
+        assert_eq!(observed.current_state(), StateFunctionType::Error);
+        
+        // Check that we have correct array sizes
+        assert_eq!(observed.hands().len(), 4);
+        assert_eq!(observed.scores().len(), 4);
+        assert_eq!(observed.points().len(), 4);
+        assert_eq!(observed.has_ronned().len(), 4);
+    }
 }

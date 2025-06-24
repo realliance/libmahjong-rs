@@ -1,6 +1,11 @@
 use std::ffi::c_int;
 
-use super::{error::MahjongFFIError, gamesettings::CGameSettings};
+use super::{
+    error::MahjongFFIError, 
+    gamesettings::CGameSettings,
+    observe::ObserveGameState
+};
+use crate::observe::ObservedGameState;
 
 /// Opaque type representing a GameState
 #[repr(C)]
@@ -57,6 +62,12 @@ impl GameState {
         } else {
             Some(Self { ptr: new_ptr })
         }
+    }
+
+    /// Observe the current game state
+    pub fn observe(&self) -> ObservedGameState {
+        let c_observed = unsafe { ObserveGameState(self.ptr) };
+        c_observed.into()
     }
 
     /// Get the raw pointer

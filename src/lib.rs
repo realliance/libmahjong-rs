@@ -2,3 +2,4 @@
 
 pub mod ffi;
 pub mod settings;
+pub mod observe;
