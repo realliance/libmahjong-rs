@@ -6,7 +6,12 @@ edition = "2021"
 [dependencies]
 libmahjong-specs = { git = "https://github.com/realliance/libmahjong-specs.git", branch = "dist/rust" }
 
-libc = "0.2.171"
+libc = "0.2"
 strum = "0.27"
 strum_macros = "0.27"
 thiserror = "2"
+
+[dev-dependencies]
+futures = "0.3"
+tokio = { version = "1", features = ["full", "macros", "rt-multi-thread"] }
+anyhow = "1"

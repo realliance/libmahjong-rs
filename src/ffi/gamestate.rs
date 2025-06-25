@@ -1,10 +1,7 @@
 use std::ffi::c_int;
+use std::sync::{Arc, Mutex, MutexGuard};
 
-use super::{
-    error::MahjongFFIError, 
-    gamesettings::CGameSettings,
-    observe::ObserveGameState
-};
+use super::{error::MahjongFFIError, gamesettings::CGameSettings, observe::ObserveGameState};
 use crate::observe::ObservedGameState;
 
 /// Opaque type representing a GameState
@@ -34,8 +31,12 @@ extern "C" {
 
 /// Safe wrapper for GameState
 pub struct GameState {
-    ptr: *mut RawGameState,
+    ptr: Arc<Mutex<Option<*mut RawGameState>>>,
 }
+
+// Safe due to the use of mutexes
+unsafe impl Send for GameState {}
+unsafe impl Sync for GameState {}
 
 impl GameState {
     /// Create a new game state from settings
@@ -49,38 +50,69 @@ impl GameState {
         if ptr.is_null() {
             Err(MahjongFFIError::FailedToAllocateGameState)
         } else {
-            Ok(Self { ptr })
+            Ok(Self {
+                ptr: Arc::new(Mutex::new(Some(ptr))),
+            })
         }
     }
 
     /// Advance the game state
-    pub fn advance(self) -> Option<Self> {
-        let new_ptr = unsafe { AdvanceGameState(self.ptr) };
-        std::mem::forget(self); // Prevent double-free since C++ takes ownership
-        if new_ptr.is_null() {
-            None
+    pub fn advance(self) -> Result<Self, MahjongFFIError> {
+        let mut guard = self
+            .ptr
+            .lock()
+            .map_err(|_| MahjongFFIError::MutexPoisoned)?;
+
+        let take_ptr = guard.take();
+
+        if let Some(ptr) = take_ptr {
+            let new_ptr = unsafe { AdvanceGameState(ptr) };
+            let _ = ptr; // Prevent double-free since C++ takes ownership
+
+            if new_ptr.is_null() {
+                Err(MahjongFFIError::GameEnded)
+            } else {
+                Ok(Self {
+                    ptr: Arc::new(Mutex::new(Some(new_ptr))),
+                })
+            }
         } else {
-            Some(Self { ptr: new_ptr })
+            Err(MahjongFFIError::GameStateConsumed)
         }
     }
 
     /// Observe the current game state
-    pub fn observe(&self) -> ObservedGameState {
-        let c_observed = unsafe { ObserveGameState(self.ptr) };
-        c_observed.into()
+    pub fn observe(&self) -> Option<ObservedGameState> {
+        let guard = self.ptr.lock().ok()?;
+
+        if let Some(ptr) = *guard {
+            let c_observed = unsafe { ObserveGameState(ptr) };
+            Some(c_observed.into())
+        } else {
+            None
+        }
     }
 
-    /// Get the raw pointer
-    pub fn as_ptr(&self) -> *mut RawGameState {
-        self.ptr
+    /// Get the raw pointer (sync version for internal use)
+    pub fn as_ptr(
+        &self,
+    ) -> Result<
+        MutexGuard<'_, Option<*mut RawGameState>>,
+        std::sync::PoisonError<MutexGuard<'_, Option<*mut RawGameState>>>,
+    > {
+        self.ptr.lock()
     }
 }
 
 impl Drop for GameState {
     fn drop(&mut self) {
-        if !self.ptr.is_null() {
-            unsafe { FreeGameState(self.ptr) };
+        // Now we can safely lock synchronously in Drop
+        if let Ok(mut guard) = self.ptr.lock() {
+            if let Some(ptr) = guard.take() {
+                unsafe { FreeGameState(ptr) };
+            }
         }
+        // If the mutex is poisoned, we can't clean up safely
     }
 }
 
