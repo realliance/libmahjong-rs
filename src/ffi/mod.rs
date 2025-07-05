@@ -5,7 +5,7 @@ pub mod observe;
 
 #[cfg(test)]
 mod tests {
-    use crate::ffi::gamestate::GameState;
+    use crate::ffi::{gamestate::GameState, observe};
     use crate::observe::StateFunctionType;
     use crate::settings::GameSettings;
     use futures::future::join_all;
@@ -100,6 +100,15 @@ mod tests {
         assert_eq!(observed.scores().len(), 4);
         assert_eq!(observed.points().len(), 4);
         assert_eq!(observed.has_ronned().len(), 4);
+
+        // Advance the game state
+        let current_gs = game_state.advance()?;
+        let observed = current_gs.observe().ok_or(anyhow::anyhow!(
+            "Failed to observe game state after advance"
+        ))?;
+
+        // Observe that the next game state is what's expected
+        assert_eq!(observed.current_state(), StateFunctionType::GameStart);
 
         Ok(())
     }

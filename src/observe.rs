@@ -1,4 +1,4 @@
-use crate::ffi::observe::{CObservedGameState, CHand, CMeld, CMeldType, CStateFunctionType};
+use crate::ffi::observe::{CHand, CMeld, CMeldType, CObservedGameState, CStateFunctionType};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MeldType {
@@ -83,7 +83,7 @@ impl From<CMeld> for Meld {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Hand {
     pub live_pieces: Vec<i32>,
     pub melds: Vec<Meld>,
@@ -100,12 +100,12 @@ impl From<CHand> for Hand {
             .iter()
             .map(|&piece| piece)
             .collect();
-        
+
         let melds = c_hand.melds[..c_hand.meld_count as usize]
             .iter()
             .map(|&meld| meld.into())
             .collect();
-        
+
         let discards = c_hand.discards[..c_hand.discard_count as usize]
             .iter()
             .map(|&piece| piece)
@@ -155,7 +155,7 @@ impl Hand {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObservedGameState {
     pub current_player: i32,
     pub turn_num: i32,
@@ -282,4 +282,4 @@ impl ObservedGameState {
     pub fn has_ronned(&self) -> &[bool; 4] {
         &self.has_ronned
     }
-} 
+}
