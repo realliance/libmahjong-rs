@@ -1,5 +1,5 @@
-use std::ffi::c_int;
 use super::gamestate::RawGameState;
+use std::ffi::c_int;
 
 /// C API constants for observed game state
 pub const MAX_LIVE_HAND_SIZE: usize = 14;
@@ -146,4 +146,4 @@ impl Default for CObservedGameState {
 extern "C" {
     /// Observe the current game state
     pub fn ObserveGameState(state: *mut RawGameState) -> CObservedGameState;
-} 
+}
