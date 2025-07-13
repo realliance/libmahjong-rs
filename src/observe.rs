@@ -96,20 +96,14 @@ pub struct Hand {
 
 impl From<CHand> for Hand {
     fn from(c_hand: CHand) -> Self {
-        let live_pieces = c_hand.live_pieces[..c_hand.live_piece_count as usize]
-            .iter()
-            .map(|&piece| piece)
-            .collect();
+        let live_pieces = c_hand.live_pieces[..c_hand.live_piece_count as usize].to_vec();
 
         let melds = c_hand.melds[..c_hand.meld_count as usize]
             .iter()
             .map(|&meld| meld.into())
             .collect();
 
-        let discards = c_hand.discards[..c_hand.discard_count as usize]
-            .iter()
-            .map(|&piece| piece)
-            .collect();
+        let discards = c_hand.discards[..c_hand.discard_count as usize].to_vec();
 
         Self {
             live_pieces,

@@ -5,7 +5,7 @@ pub mod observe;
 
 #[cfg(test)]
 mod tests {
-    use crate::ffi::{gamestate::GameState, observe};
+    use crate::ffi::gamestate::GameState;
     use crate::observe::StateFunctionType;
     use crate::settings::GameSettings;
     use futures::future::join_all;
