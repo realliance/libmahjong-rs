@@ -7,7 +7,7 @@ pub mod settings;
 #[cfg(test)]
 mod tests {
     use crate::{ffi::gamestate::GameState, observe::StateFunctionType, settings::GameSettings};
-    use std::collections::VecDeque;
+    use std::{collections::VecDeque, fs::File, io::Write};
 
     #[test]
     fn can_run_match() {
@@ -20,7 +20,14 @@ mod tests {
                 "AngryDiscardoBot".to_string(),
             ],
         };
-        println!("Starting game with settings: {:?}", settings);
+
+        let mut log = File::create("test_match.log").unwrap();
+
+        log.write_fmt(format_args!(
+            "Starting game with settings: {:?}\n",
+            settings
+        ))
+        .unwrap();
         let mut game_state = GameState::new(settings).unwrap();
 
         let mut counter = 0;
@@ -28,10 +35,13 @@ mod tests {
 
         let mut last_observed = None;
         while let Some(observed) = game_state.observe() {
-            println!(
-                "Turn {}: {:?} -> {:?} -> {:?}",
+            log.write_fmt(format_args!(
+                "Turn {}: {:?} -> {:?} -> {:?}\n",
                 counter, observed.prev_state, observed.curr_state, observed.next_state
-            );
+            ))
+            .unwrap();
+
+            let should_end = observed.curr_state == StateFunctionType::GameEnd;
 
             if history.len() == 20 {
                 history.pop_front();
@@ -44,6 +54,12 @@ mod tests {
             ));
 
             last_observed = Some(observed);
+            if should_end {
+                log.write_fmt(format_args!("Game ended at turn {}\n", counter))
+                    .unwrap();
+                break;
+            }
+
             game_state = game_state.advance().unwrap();
 
             counter += 1;
